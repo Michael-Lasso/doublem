@@ -1,268 +1,228 @@
-CREATE TABLE manager_account (
-    manager_id INTEGER NOT NULL AUTO_INCREMENT,
-    username VARCHAR(30) NOT NULL,
-    password VARCHAR(30) NOT NULL,
-    salt VARCHAR(15) NOT NULL,
-    PRIMARY KEY (`manager_id`)
-)  ENGINE=INNODB AUTO_INCREMENT=1 DEFAULT CHARSET=LATIN1;
-
+/*
+1 
+drop table profile
+*/
+CREATE TABLE profile (
+user_id BIGINT NOT NULL AUTO_INCREMENT,
+first_name VARCHAR(100) NOT NULL,
+last_name VARCHAR(100) NOT NULL,
+age INTEGER,
+score DOUBLE,
+categories VARCHAR(1000),
+author VARCHAR(1000),
+achievements VARCHAR(1000),
+friend_list VARCHAR(1000),
+email VARCHAR(1000),
+    PRIMARY KEY (`user_id`)
+)  ENGINE=INNODB AUTO_INCREMENT=1000 DEFAULT CHARSET=LATIN1; 
+/*
+2
+drop table user
+*/
+CREATE TABLE user (
+    `username` VARCHAR(100) NOT NULL,
+    `password` VARCHAR(100) NOT NULL,
+    `user_id` BIGINT NOT NULL,
+    `role` VARCHAR(100) NOT NULL,
+    `salt` VARCHAR(15) NOT NULL,
+    PRIMARY KEY (`username`),
+    CONSTRAINT profile_fk_user FOREIGN KEY (user_id)
+        REFERENCES profile (user_id)
+)  ENGINE=INNODB DEFAULT CHARSET=LATIN1;
+/*
+3
+drop table category
+*/
 CREATE TABLE category (
-    category_id INTEGER NOT NULL AUTO_INCREMENT,
+    category_id BIGINT NOT NULL AUTO_INCREMENT,
     category_name VARCHAR(30) NOT NULL,
-	description VARCHAR(255),
+	category_date DATE,
     PRIMARY KEY (`category_id`)
-)  ENGINE=INNODB AUTO_INCREMENT=1 DEFAULT CHARSET=LATIN1;
-
-CREATE TABLE product (
-    product_id BIGINT NOT NULL AUTO_INCREMENT,
-    category_id INTEGER NOT NULL,
-    product_name VARCHAR(50) NOT NULL,
-    description VARCHAR(2000),
-    featured_product BOOLEAN,
-    company_name VARCHAR(35),
-    buy_price DOUBLE NOT NULL,
-    sell_price DOUBLE NOT NULL,
-    packaging BOOLEAN,
-    video_link VARCHAR(100),
-    treshold_max INTEGER,
-    treshold_min INTEGER,
-    weight DOUBLE,
-    dimension VARCHAR(24),
-    logistic_price DOUBLE NOT NULL,
-    featured_product_date TIMESTAMP,
-    created_date DATE,
-    updated_date DATE,
-    tarif DOUBLE NOT NULL,
-    over_stock_days INTEGER,
-    percentage_deal DOUBLE NOT NULL,
-    season_reup_alert_days INTEGER,
-    season_reup_alert_date DATE,
-    tags VARCHAR(1000),
-    PRIMARY KEY (`product_id`),
-    CONSTRAINT product_fk_category FOREIGN KEY (category_id)
+)  ENGINE=INNODB AUTO_INCREMENT=1000 DEFAULT CHARSET=LATIN1;
+/*
+4
+drop table story
+*/
+CREATE TABLE story (
+    story_id BIGINT NOT NULL AUTO_INCREMENT,
+    category_id BIGINT NOT NULL,
+    description VARCHAR(100) NOT NULL,
+    rated VARCHAR(16) NOT NULL,
+    PRIMARY KEY (`story_id`),
+    CONSTRAINT story_fk_category FOREIGN KEY (category_id)
         REFERENCES category (category_id)
 )  ENGINE=INNODB AUTO_INCREMENT=1000 DEFAULT CHARSET=LATIN1; 
-
-CREATE TABLE address (
-    address_id BIGINT NOT NULL AUTO_INCREMENT,
-    street VARCHAR(150) NOT NULL,
-    city VARCHAR(50) NOT NULL,
-    state VARCHAR(40) NOT NULL,
-    zip_code VARCHAR(40),
-    country VARCHAR(40) NOT NULL,
-    phone_number VARCHAR(40),
-    PRIMARY KEY (`address_id`)
-)  ENGINE=INNODB AUTO_INCREMENT=1000 DEFAULT CHARSET=LATIN1; 
-
-CREATE TABLE users (
-    user_id BIGINT NOT NULL AUTO_INCREMENT,
-    address_id BIGINT NOT NULL,
-    created_date DATE NOT NULL,
-    updated_date DATE NOT NULL,
-    company_name VARCHAR(100),
-    first_name VARCHAR(50),
-    last_name VARCHAR(50),
-    password VARCHAR(50) NOT NULL,
-    salt VARCHAR(15) NOT NULL,
-    email VARCHAR(100) NOT NULL,
-    PRIMARY KEY (`user_id`),
-    CONSTRAINT user_fk_address FOREIGN KEY (address_id)
-        REFERENCES address (address_id)
-)  ENGINE=INNODB AUTO_INCREMENT=1000 DEFAULT CHARSET=LATIN1; 
-
 /*
-salt needed for encrypting discount_code
+5
+drop table episode
 */
-CREATE TABLE orders (
-    order_id BIGINT NOT NULL AUTO_INCREMENT,
-    user_id BIGINT NOT NULL,
-    sell_date DATE NOT NULL,
-    sell_price DOUBLE NOT NULL,
-    receive_date DATE,
-    discount_code VARCHAR(30),
-    salt VARCHAR(15),
-    order_open BOOLEAN,
-    order_cancel BOOLEAN,
-    order_return BOOLEAN,
-    PRIMARY KEY (`order_id`),
-    CONSTRAINT order_fk_user FOREIGN KEY (user_id)
-        REFERENCES users (user_id)
+CREATE TABLE episode (
+    episode_id BIGINT NOT NULL AUTO_INCREMENT,
+    story_id BIGINT NOT NULL,
+    content BLOB NOT NULL,
+    publish VARCHAR(100) NOT NULL,
+    published_date DATE,
+    PRIMARY KEY (`episode_id`),
+    CONSTRAINT episode_fk_story FOREIGN KEY (story_id)
+        REFERENCES story (story_id)
 )  ENGINE=INNODB AUTO_INCREMENT=1000 DEFAULT CHARSET=LATIN1;
-
-CREATE TABLE re_stock_order (
-    tracking_number VARCHAR(100) NOT NULL,
-    description VARCHAR(200),
-    order_date DATE,
-    arrive_date DATE,
-    PRIMARY KEY (`tracking_number`)
-)  ENGINE=INNODB DEFAULT CHARSET=LATIN1;
-
-CREATE TABLE re_stock_item (
-    restock_id BIGINT NOT NULL AUTO_INCREMENT,
-    product_id BIGINT NOT NULL,
-    tracking_number VARCHAR(100) NOT NULL,
-	description VARCHAR(512) NOT NULL,
-	username VARCHAR(30) NOT NULL,
-    quantity_ordered INTEGER NOT NULL,
-    deficient_quantity INTEGER,
-    PRIMARY KEY (`restock_id`),
-    CONSTRAINT stock_fk_product FOREIGN KEY (product_id)
-        REFERENCES product (product_id),
-    CONSTRAINT stock_fk_tracking FOREIGN KEY (tracking_number)
-        REFERENCES re_stock_order (tracking_number)
-)  ENGINE=INNODB AUTO_INCREMENT=1000 DEFAULT CHARSET=LATIN1;
-
-CREATE TABLE inventory (
-    serial_number VARCHAR(100) NOT NULL,
-	product_id BIGINT NOT NULL,
-    restock_id BIGINT NOT NULL,
-    entry_date DATE NOT NULL,
-    exit_date DATE,
-    shipped_date DATE,
-    receive_date DATE,
-    deficient_date DATE,
-    return_date DATE,
-    warehouse_row VARCHAR(10),
-    warehouse_column VARCHAR(10),
-    available BOOLEAN NOT NULL,
-    PRIMARY KEY (`serial_number`),
-    CONSTRAINT inventory_fk_restock FOREIGN KEY (restock_id)
-        REFERENCES re_stock_item (restock_id),
-    CONSTRAINT inventory_fk_product FOREIGN KEY (product_id)
-        REFERENCES product (product_id)
-)  ENGINE=INNODB DEFAULT CHARSET=LATIN1;
-
-CREATE TABLE product_order (
-    serial_number VARCHAR(100) NOT NULL,
-    order_id BIGINT NOT NULL,
-    sell_quantity INTEGER NOT NULL,
-    sell_price DOUBLE NOT NULL,
-    CONSTRAINT order_fk_product FOREIGN KEY (serial_number)
-        REFERENCES inventory (serial_number),
-    CONSTRAINT order_fk_order FOREIGN KEY (order_id)
-        REFERENCES orders (order_id)
-)  ENGINE=INNODB DEFAULT CHARSET=LATIN1;
-
-CREATE TABLE warehouse (
-    warehouse_id BIGINT NOT NULL AUTO_INCREMENT,
-    warehouse_name VARCHAR(50) NOT NULL,
-    street VARCHAR(150) NOT NULL,
-    city VARCHAR(50) NOT NULL,
-    state VARCHAR(40) NOT NULL,
-    zip_code VARCHAR(40),
-    country VARCHAR(40) NOT NULL,
-    phone_number VARCHAR(40),
-    PRIMARY KEY (`warehouse_id`)
-)  ENGINE=INNODB AUTO_INCREMENT=1000 DEFAULT CHARSET=LATIN1;
-
-CREATE TABLE warehouse_inventory (
-    warehouse_id BIGINT NOT NULL,
-    serial_number VARCHAR(100) NOT NULL,
-    CONSTRAINT inventory_fk_warehouse FOREIGN KEY (warehouse_id)
-        REFERENCES warehouse (warehouse_id),
-    CONSTRAINT inventory_fk_serialn FOREIGN KEY (serial_number)
-        REFERENCES inventory (serial_number)
-)  ENGINE=INNODB DEFAULT CHARSET=LATIN1;
-
-CREATE TABLE administrator (
-    admin_id BIGINT NOT NULL AUTO_INCREMENT,
-    warehouse_id BIGINT NOT NULL,
-    first_name VARCHAR(30) NOT NULL,
-    last_name VARCHAR(30) NOT NULL,
-    street VARCHAR(150) NOT NULL,
-    city VARCHAR(50) NOT NULL,
-    state VARCHAR(40) NOT NULL,
-    zip_code VARCHAR(40),
-    country VARCHAR(40) NOT NULL,
-    phone_number VARCHAR(40),
-    email VARCHAR(100) NOT NULL ,
-    password VARCHAR(30) NOT NULL,
-    permissions VARCHAR(256) NOT NULL,
-    salt VARCHAR(15) NOT NULL,
-    PRIMARY KEY (`admin_id`),
-    CONSTRAINT admin_fk_warehouse FOREIGN KEY (warehouse_id)
-        REFERENCES warehouse (warehouse_id)
-)  ENGINE=INNODB AUTO_INCREMENT=1000 DEFAULT CHARSET=LATIN1;
-
-CREATE TABLE email_alert (
-    alert_id BIGINT NOT NULL AUTO_INCREMENT,
-    type_id VARCHAR(50) NOT NULL,
-    alert_name VARCHAR(50) NOT NULL,
-    property_id BIGINT NOT NULL,
-    description VARCHAR(256) NOT NULL,
-    created_date DATE NOT NULL,
-    PRIMARY KEY (`alert_id`)
-)  ENGINE=INNODB AUTO_INCREMENT=1000 DEFAULT CHARSET=LATIN1;
-
+/*
+6
+drop table review
+*/
 CREATE TABLE review (
     review_id BIGINT NOT NULL AUTO_INCREMENT,
-    product_id BIGINT NOT NULL,
     user_id BIGINT NOT NULL,
-    description BLOB,
-    stars INTEGER NOT NULL,
-    review_date DATE NOT NULL,
+    episode_id BIGINT NOT NULL,
+    rating INTEGER,
+    liked BOOLEAN,
+    comment VARCHAR(1000),
     PRIMARY KEY (`review_id`),
-    CONSTRAINT review_fk_product FOREIGN KEY (product_id)
-        REFERENCES product (product_id),
     CONSTRAINT review_fk_user FOREIGN KEY (user_id)
-        REFERENCES users (user_id)
-)  ENGINE=INNODB AUTO_INCREMENT=1000 DEFAULT CHARSET=LATIN1;
-
-CREATE TABLE deal (
-    deal_id BIGINT NOT NULL AUTO_INCREMENT,
-    category_id INTEGER,
-    product_id BIGINT,
-	deal_name VARCHAR(50) NOT NULL,
-	start_date	DATE NOT NULL,
-	end_date	DATE NOT NULL,
-    PRIMARY KEY (`deal_id`),
-    FOREIGN KEY (category_id)
-        REFERENCES category (category_id),
-    FOREIGN KEY (product_id)
-        REFERENCES product (product_id)
-)  ENGINE=INNODB AUTO_INCREMENT=1000 DEFAULT CHARSET=LATIN1;
-
+        REFERENCES profile (user_id),
+    CONSTRAINT review_fk_episode FOREIGN KEY (episode_id)
+        REFERENCES episode (episode_id)
+)  ENGINE=INNODB AUTO_INCREMENT=1000 DEFAULT CHARSET=LATIN1; 
 /*
-Need salt for encrypting discount_code
+7
+drop table achievement
 */
-CREATE TABLE discount_code (
-    discount_id BIGINT NOT NULL AUTO_INCREMENT,
-    category_id INTEGER NOT NULL,
+CREATE TABLE achievement (
+    achievement_id BIGINT NOT NULL AUTO_INCREMENT,
+    achievement_name VARCHAR(100) NOT NULL,
+    PRIMARY KEY (`achievement_id`)
+)  ENGINE=INNODB AUTO_INCREMENT=1000 DEFAULT CHARSET=LATIN1;
+/*
+8
+drop table suggestion
+*/
+CREATE TABLE suggestion (
+    suggestion_id BIGINT NOT NULL AUTO_INCREMENT,
+    user_id BIGINT NOT NULL,
+    episode_id BIGINT NOT NULL,
+    suggestion VARCHAR(1000),
+    suggestion_date DATE,
+    PRIMARY KEY (`suggestion_id`),
+    CONSTRAINT suggestion_fk_user FOREIGN KEY (user_id)
+        REFERENCES profile (user_id),
+    CONSTRAINT suggestion_fk_episode FOREIGN KEY (episode_id)
+        REFERENCES episode (episode_id)
+)  ENGINE=INNODB AUTO_INCREMENT=1000 DEFAULT CHARSET=LATIN1;
+/*
+9
+drop table note
+*/
+CREATE TABLE note (
+    note_id BIGINT NOT NULL AUTO_INCREMENT,
+    user_id BIGINT NOT NULL,
+    episode_id BIGINT NOT NULL,
+    coordinates VARCHAR(100),
+    content VARCHAR(1000),
+    note_date DATE,
+    PRIMARY KEY (`note_id`),
+    CONSTRAINT note_fk_user FOREIGN KEY (user_id)
+        REFERENCES profile (user_id),
+    CONSTRAINT note_fk_episode FOREIGN KEY (episode_id)
+        REFERENCES episode (episode_id)
+)  ENGINE=INNODB AUTO_INCREMENT=1000 DEFAULT CHARSET=LATIN1;
+/*
+10
+drop table warning
+*/
+CREATE TABLE warning (
+    warning_id BIGINT NOT NULL AUTO_INCREMENT,
+    story_id BIGINT,
+    review_id BIGINT,
+    user_id BIGINT,
+    description VARCHAR(1000),
+    reported_by BIGINT NOT NULL,
+    warning_date DATE,
+    PRIMARY KEY (`warning_id`),
+    CONSTRAINT warning_fk_story FOREIGN KEY (story_id)
+        REFERENCES story (story_id),
+    CONSTRAINT warning_fk_review FOREIGN KEY (review_id)
+        REFERENCES review (review_id),
+    CONSTRAINT warning_fk_user FOREIGN KEY (user_id)
+        REFERENCES profile (user_id)
+)  ENGINE=INNODB AUTO_INCREMENT=1000 DEFAULT CHARSET=LATIN1;
+/*
+11
+drop table banned
+*/
+CREATE TABLE banned (
+    ban_id BIGINT NOT NULL AUTO_INCREMENT,
+    reported_id BIGINT NOT NULL,
+    reporter_id BIGINT NOT NULL,
     start_date DATE NOT NULL,
     end_date DATE NOT NULL,
-    discount_name VARCHAR(30) NOT NULL,
-    discount_code VARCHAR(30) NOT NULL,
-    salt VARCHAR(15) NOT NULL,
-    PRIMARY KEY (`discount_id`),
-    CONSTRAINT discount_fk_category FOREIGN KEY (category_id)
+    description VARCHAR(1000) NOT NULL,
+    reported_by BIGINT NOT NULL,
+    PRIMARY KEY (`ban_id`),
+    CONSTRAINT ban_fk_reported FOREIGN KEY (reported_id)
+        REFERENCES profile (user_id),
+    CONSTRAINT ban_fk_reporter FOREIGN KEY (reporter_id)
+        REFERENCES profile (user_id)
+)  ENGINE=INNODB AUTO_INCREMENT=1000 DEFAULT CHARSET=LATIN1;  
+/*
+12
+drop table user_category
+*/
+CREATE TABLE user_category (
+    user_id BIGINT NOT NULL,
+    category_id BIGINT NOT NULL,
+    CONSTRAINT user_fk_category FOREIGN KEY (user_id)
+        REFERENCES profile (user_id),
+    CONSTRAINT category_fk_user FOREIGN KEY (category_id)
         REFERENCES category (category_id)
-)  ENGINE=INNODB AUTO_INCREMENT=1000 DEFAULT CHARSET=LATIN1;
-
-CREATE TABLE affiliated_company (
-    company_id BIGINT NOT NULL AUTO_INCREMENT,
-    discount_id BIGINT,
-    start_affiliated_date DATE NOT NULL,
-    end_affiliated_date DATE,
-    company_name VARCHAR(30) NOT NULL,
-    street VARCHAR(150) NOT NULL,
-    city VARCHAR(50) NOT NULL,
-    state VARCHAR(40) NOT NULL,
-    zip_code VARCHAR(40),
-    country VARCHAR(40) NOT NULL,
-    phone_number VARCHAR(40),
-    company_email VARCHAR(100) NOT NULL,
-    PRIMARY KEY (`company_id`),
-    CONSTRAINT affcompany_fk_discount FOREIGN KEY (discount_id)
-        REFERENCES discount_code (discount_id)
-)  ENGINE=INNODB AUTO_INCREMENT=1000 DEFAULT CHARSET=LATIN1;
-
-CREATE TABLE image (
-    image_id BIGINT NOT NULL AUTO_INCREMENT,
-    product_id BIGINT NOT NULL,
-    image_name VARCHAR(30) NOT NULL,
-    url VARCHAR(256) NOT NULL,
-    PRIMARY KEY (`image_id`),
-    FOREIGN KEY (product_id)
-        REFERENCES product (product_id)
-)  ENGINE=INNODB AUTO_INCREMENT=1000 DEFAULT CHARSET=LATIN1;
-
+) ENGINE=INNODB DEFAULT CHARSET=LATIN1;
+/*
+13
+drop table user_story
+*/
+CREATE TABLE user_story(
+    user_id BIGINT NOT NULL,
+    story_id BIGINT NOT NULL,
+    CONSTRAINT user_fk_story FOREIGN KEY (user_id)
+        REFERENCES profile (user_id),
+    CONSTRAINT story_fk_user FOREIGN KEY (story_id)
+        REFERENCES story (story_id)
+) ENGINE=INNODB DEFAULT CHARSET=LATIN1;
+/*
+14
+drop table user_achievement
+*/
+CREATE TABLE user_achievement(
+    user_id BIGINT NOT NULL,
+    achievement_id BIGINT NOT NULL,
+    earned_date DATE NOT NULL,
+    CONSTRAINT user_fk_achievement FOREIGN KEY (user_id)
+        REFERENCES profile (user_id),
+    CONSTRAINT achievement_fk_user FOREIGN KEY (achievement_id)
+        REFERENCES achievement (achievement_id)
+) ENGINE=INNODB DEFAULT CHARSET=LATIN1;
+/*
+15
+drop table user_author
+*/
+CREATE TABLE user_author(
+    user_id BIGINT NOT NULL,
+    author_id BIGINT NOT NULL,
+    earned_date DATE NOT NULL,
+    CONSTRAINT user_fk_author FOREIGN KEY (user_id)
+        REFERENCES profile (user_id),
+    CONSTRAINT author_fk_user FOREIGN KEY (author_id)
+        REFERENCES profile (user_id)
+) ENGINE=INNODB DEFAULT CHARSET=LATIN1;
+/*
+16
+drop table user_friend
+*/
+CREATE TABLE user_friend(
+    user_id BIGINT NOT NULL,
+    friend_id BIGINT NOT NULL,
+    earned_date DATE NOT NULL,
+    CONSTRAINT user_fk_friend FOREIGN KEY (user_id)
+        REFERENCES profile (user_id),
+    CONSTRAINT friend_fk_user FOREIGN KEY (friend_id)
+        REFERENCES profile (user_id)
+) ENGINE=INNODB DEFAULT CHARSET=LATIN1;
