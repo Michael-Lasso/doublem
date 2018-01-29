@@ -162,9 +162,40 @@ CREATE TABLE banned (
         REFERENCES profile (user_id),
     CONSTRAINT ban_fk_reporter FOREIGN KEY (reporter_id)
         REFERENCES profile (user_id)
-)  ENGINE=INNODB AUTO_INCREMENT=1000 DEFAULT CHARSET=LATIN1;  
+)  ENGINE=INNODB AUTO_INCREMENT=1000 DEFAULT CHARSET=LATIN1;
 /*
 12
+drop table message
+*/
+CREATE TABLE message (
+    message_id BIGINT NOT NULL AUTO_INCREMENT,
+    creator_id BIGINT NOT NULL,
+    parent_id BIGINT,
+    content VARCHAR(1000) NOT NULL,
+    created_date DATE NOT NULL,
+    PRIMARY KEY (`message_id`),
+    CONSTRAINT message_fk_creator FOREIGN KEY (creator_id)
+        REFERENCES profile (user_id),
+    CONSTRAINT message_fk_parent FOREIGN KEY (parent_id)
+        REFERENCES message (message_id)
+)  ENGINE=INNODB AUTO_INCREMENT=1000 DEFAULT CHARSET=LATIN1;
+/*
+13
+drop table message_recipient
+*/
+CREATE TABLE message_recipient (
+    id BIGINT NOT NULL AUTO_INCREMENT,
+    recipient_id BIGINT NOT NULL,
+    message_id BIGINT NOT NULL,
+    is_read boolean,
+    PRIMARY KEY (`id`),
+    CONSTRAINT recipient_fk_recipient FOREIGN KEY (recipient_id)
+        REFERENCES profile (user_id),
+    CONSTRAINT recipient_fk_message FOREIGN KEY (message_id)
+        REFERENCES message (message_id)
+) ENGINE=INNODB AUTO_INCREMENT=1000 DEFAULT CHARSET=LATIN1;
+/*
+14
 drop table user_category
 */
 CREATE TABLE user_category (
@@ -176,7 +207,7 @@ CREATE TABLE user_category (
         REFERENCES category (category_id)
 ) ENGINE=INNODB DEFAULT CHARSET=LATIN1;
 /*
-13
+15
 drop table user_story
 */
 CREATE TABLE user_story(
@@ -188,7 +219,7 @@ CREATE TABLE user_story(
         REFERENCES story (story_id)
 ) ENGINE=INNODB DEFAULT CHARSET=LATIN1;
 /*
-14
+16
 drop table user_achievement
 */
 CREATE TABLE user_achievement(
@@ -201,7 +232,7 @@ CREATE TABLE user_achievement(
         REFERENCES achievement (achievement_id)
 ) ENGINE=INNODB DEFAULT CHARSET=LATIN1;
 /*
-15
+17
 drop table user_author
 */
 CREATE TABLE user_author(
@@ -214,7 +245,7 @@ CREATE TABLE user_author(
         REFERENCES profile (user_id)
 ) ENGINE=INNODB DEFAULT CHARSET=LATIN1;
 /*
-16
+18
 drop table user_friend
 */
 CREATE TABLE user_friend(

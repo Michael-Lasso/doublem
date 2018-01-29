@@ -1,23 +1,31 @@
 /*
-16
+18
 */
 drop table user_friend;
 /*
-15
+17
 */
 drop table user_author;
 /*
-14
+16
 */
 drop table user_achievement;
 /*
-13
+15
 */
 drop table user_story;
 /*
-12
+14
 */
 drop table user_category;
+/*
+13
+*/
+drop table message_recipient;
+/*
+12
+*/
+drop table message;
 /*
 11
 */

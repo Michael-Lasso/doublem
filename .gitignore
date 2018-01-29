@@ -33,3 +33,4 @@ red-runner-rest/src/main/webapp/
 *.log
 *.pages
 *.numbers
+*.key
