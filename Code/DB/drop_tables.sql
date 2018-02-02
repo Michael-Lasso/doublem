@@ -1,4 +1,20 @@
 /*
+22
+*/
+drop table save_episode;
+/*
+21
+*/
+drop table story_category;
+/*
+20
+*/
+drop table is_story_read;
+/*
+19
+*/
+drop table recommendations;
+/*
 18
 */
 drop table user_friend;
