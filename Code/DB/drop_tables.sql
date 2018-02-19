@@ -57,7 +57,7 @@ drop table note;
 /*
 8
 */
-drop table suggestion;
+drop table event;
 /*
 7
 */

@@ -3,18 +3,18 @@
 drop table profile
 */
 CREATE TABLE profile (
-user_id BIGINT NOT NULL AUTO_INCREMENT,
-first_name VARCHAR(100) NOT NULL,
-last_name VARCHAR(100) NOT NULL,
-age INTEGER,
-score DOUBLE,
-categories VARCHAR(1000),
-author VARCHAR(1000),
-achievements VARCHAR(1000),
-friend_list VARCHAR(1000),
-email VARCHAR(1000),
-    PRIMARY KEY (`user_id`)
-)  ENGINE=INNODB AUTO_INCREMENT=1000 DEFAULT CHARSET=LATIN1; 
+    `id` BINARY(16) NOT NULL,
+    first_name VARCHAR(100) NOT NULL,
+    last_name VARCHAR(100) NOT NULL,
+    age INTEGER,
+    score DOUBLE,
+    categories VARCHAR(1000),
+    author VARCHAR(1000),
+    achievements VARCHAR(1000),
+    friend_list VARCHAR(1000),
+    email VARCHAR(1000),
+    PRIMARY KEY (`id`)
+)  ENGINE=INNODB DEFAULT CHARSET=LATIN1;
 /*
 2
 drop table user
@@ -22,286 +22,279 @@ drop table user
 CREATE TABLE user (
     `username` VARCHAR(100) NOT NULL,
     `password` VARCHAR(100) NOT NULL,
-    `user_id` BIGINT NOT NULL,
+    `id` BINARY(16) NOT NULL,
     `role` VARCHAR(100) NOT NULL,
     `salt` VARCHAR(15) NOT NULL,
     PRIMARY KEY (`username`),
-    CONSTRAINT profile_fk_user FOREIGN KEY (user_id)
-        REFERENCES profile (user_id)
+    CONSTRAINT profile_fk_user FOREIGN KEY (`id`)
+        REFERENCES profile (`id`)
 )  ENGINE=INNODB DEFAULT CHARSET=LATIN1;
 /*
 3
 drop table category
 */
 CREATE TABLE category (
-    category_id BIGINT NOT NULL AUTO_INCREMENT,
+    `id` BINARY(16) NOT NULL,
     category_name VARCHAR(30) NOT NULL,
-	category_date DATE,
-    PRIMARY KEY (`category_id`)
-)  ENGINE=INNODB AUTO_INCREMENT=1000 DEFAULT CHARSET=LATIN1;
+    category_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (`id`)
+)  ENGINE=INNODB DEFAULT CHARSET=LATIN1;
 /*
 4
 drop table story
 */
 CREATE TABLE story (
-    story_id BIGINT NOT NULL AUTO_INCREMENT,
+    `id` BINARY(16) NOT NULL,
     name VARCHAR(100),
     description VARCHAR(100) NOT NULL,
     rated VARCHAR(16) NOT NULL,
-    PRIMARY KEY (`story_id`)
-)  ENGINE=INNODB AUTO_INCREMENT=1000 DEFAULT CHARSET=LATIN1; 
+    PRIMARY KEY (`id`)
+)  ENGINE=INNODB DEFAULT CHARSET=LATIN1;
 /*
 5
 drop table episode
 */
 CREATE TABLE episode (
-    episode_id BIGINT NOT NULL AUTO_INCREMENT,
-    story_id BIGINT NOT NULL,
+    `id` BINARY(16) NOT NULL,
+    story_id BINARY(16) NOT NULL,
     name VARCHAR(100),
     content BLOB NOT NULL,
     publish VARCHAR(100) NOT NULL,
-    published_date DATE,
-    PRIMARY KEY (`episode_id`),
+    published_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (`id`),
     CONSTRAINT episode_fk_story FOREIGN KEY (story_id)
-        REFERENCES story (story_id)
-)  ENGINE=INNODB AUTO_INCREMENT=1000 DEFAULT CHARSET=LATIN1;
+        REFERENCES story (`id`)
+)  ENGINE=INNODB DEFAULT CHARSET=LATIN1;
 /*
 6
 drop table review
 */
 CREATE TABLE review (
-    review_id BIGINT NOT NULL AUTO_INCREMENT,
-    user_id BIGINT NOT NULL,
-    episode_id BIGINT NOT NULL,
+    `id` BINARY(16) NOT NULL,
+    user_id BINARY(16) NOT NULL,
+    episode_id BINARY(16) NOT NULL,
     rating INTEGER,
     liked BOOLEAN,
     comment VARCHAR(1000),
-    PRIMARY KEY (`review_id`),
+    PRIMARY KEY (`id`),
     CONSTRAINT review_fk_user FOREIGN KEY (user_id)
-        REFERENCES profile (user_id),
+        REFERENCES profile (`id`),
     CONSTRAINT review_fk_episode FOREIGN KEY (episode_id)
-        REFERENCES episode (episode_id)
-)  ENGINE=INNODB AUTO_INCREMENT=1000 DEFAULT CHARSET=LATIN1; 
+        REFERENCES episode (`id`)
+)  ENGINE=INNODB DEFAULT CHARSET=LATIN1;
 /*
 7
 drop table achievement
 */
 CREATE TABLE achievement (
-    achievement_id BIGINT NOT NULL AUTO_INCREMENT,
+    `id` BINARY(16) NOT NULL,
     achievement_name VARCHAR(100) NOT NULL,
-    PRIMARY KEY (`achievement_id`)
-)  ENGINE=INNODB AUTO_INCREMENT=1000 DEFAULT CHARSET=LATIN1;
+    PRIMARY KEY (`id`)
+)  ENGINE=INNODB DEFAULT CHARSET=LATIN1;
 /*
 8
-drop table suggestion
+drop table event
 */
-CREATE TABLE suggestion (
-    suggestion_id BIGINT NOT NULL AUTO_INCREMENT,
-    user_id BIGINT NOT NULL,
-    episode_id BIGINT NOT NULL,
-    suggestion VARCHAR(1000),
-    suggestion_date DATE,
-    PRIMARY KEY (`suggestion_id`),
-    CONSTRAINT suggestion_fk_user FOREIGN KEY (user_id)
-        REFERENCES profile (user_id),
-    CONSTRAINT suggestion_fk_episode FOREIGN KEY (episode_id)
-        REFERENCES episode (episode_id)
-)  ENGINE=INNODB AUTO_INCREMENT=1000 DEFAULT CHARSET=LATIN1;
+CREATE TABLE event (
+    `id` BINARY(16) NOT NULL,
+    event_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    description VARCHAR(252) NOT NULL,
+    rated VARCHAR(16) NOT NULL,
+    PRIMARY KEY (`id`)
+)  ENGINE=INNODB DEFAULT CHARSET=LATIN1;
 /*
 9
 drop table note
 */
 CREATE TABLE note (
-    note_id BIGINT NOT NULL AUTO_INCREMENT,
-    user_id BIGINT NOT NULL,
-    episode_id BIGINT NOT NULL,
+    `id` BINARY(16) NOT NULL,
+    user_id BINARY(16) NOT NULL,
+    episode_id BINARY(16) NOT NULL,
     coordinates VARCHAR(100),
     content VARCHAR(1000),
-    note_date DATE,
-    PRIMARY KEY (`note_id`),
+    note_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (`id`),
     CONSTRAINT note_fk_user FOREIGN KEY (user_id)
-        REFERENCES profile (user_id),
+        REFERENCES profile (`id`),
     CONSTRAINT note_fk_episode FOREIGN KEY (episode_id)
-        REFERENCES episode (episode_id)
-)  ENGINE=INNODB AUTO_INCREMENT=1000 DEFAULT CHARSET=LATIN1;
+        REFERENCES episode (`id`)
+)  ENGINE=INNODB DEFAULT CHARSET=LATIN1;
 /*
 10
 drop table warning
 */
 CREATE TABLE warning (
-    warning_id BIGINT NOT NULL AUTO_INCREMENT,
-    story_id BIGINT,
-    review_id BIGINT,
-    user_id BIGINT,
+    `id` BINARY(16) NOT NULL,
+    episode_id BINARY(16),
+    review_id BINARY(16),
+    user_id BINARY(16),
     description VARCHAR(1000),
-    reported_by BIGINT NOT NULL,
-    warning_date DATE,
-    PRIMARY KEY (`warning_id`),
-    CONSTRAINT warning_fk_story FOREIGN KEY (story_id)
-        REFERENCES story (story_id),
+    reported_by BINARY(16) NOT NULL,
+    warning_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (`id`),
+    CONSTRAINT warning_fk_story FOREIGN KEY (episode_id)
+        REFERENCES episode (`id`),
     CONSTRAINT warning_fk_review FOREIGN KEY (review_id)
-        REFERENCES review (review_id),
+        REFERENCES review (`id`),
     CONSTRAINT warning_fk_user FOREIGN KEY (user_id)
-        REFERENCES profile (user_id)
-)  ENGINE=INNODB AUTO_INCREMENT=1000 DEFAULT CHARSET=LATIN1;
+        REFERENCES profile (`id`)
+)  ENGINE=INNODB DEFAULT CHARSET=LATIN1;
 /*
 11
 drop table banned
 */
 CREATE TABLE banned (
-    ban_id BIGINT NOT NULL AUTO_INCREMENT,
-    reported_id BIGINT NOT NULL,
-    reporter_id BIGINT NOT NULL,
-    start_date DATE NOT NULL,
-    end_date DATE NOT NULL,
+    `id` BINARY(16) NOT NULL,
+    banned_user BINARY(16) NOT NULL,
+    bannned_by BINARY(16) NOT NULL,
+    start_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    end_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     description VARCHAR(1000) NOT NULL,
-    reported_by BIGINT NOT NULL,
-    PRIMARY KEY (`ban_id`),
-    CONSTRAINT ban_fk_reported FOREIGN KEY (reported_id)
-        REFERENCES profile (user_id),
-    CONSTRAINT ban_fk_reporter FOREIGN KEY (reporter_id)
-        REFERENCES profile (user_id)
-)  ENGINE=INNODB AUTO_INCREMENT=1000 DEFAULT CHARSET=LATIN1;
+    PRIMARY KEY (`id`),
+    CONSTRAINT ban_fk_reported FOREIGN KEY (banned_user)
+        REFERENCES profile (`id`),
+    CONSTRAINT ban_fk_reporter FOREIGN KEY (bannned_by)
+        REFERENCES profile (`id`)
+)  ENGINE=INNODB DEFAULT CHARSET=LATIN1;
 /*
 12
 drop table message
 */
 CREATE TABLE message (
-    message_id BIGINT NOT NULL AUTO_INCREMENT,
-    creator_id BIGINT NOT NULL,
-    parent_id BIGINT,
+    `id` BINARY(16) NOT NULL,
+    creator_id BINARY(16) NOT NULL,
+    parent_id BINARY(16),
     content VARCHAR(1000) NOT NULL,
-    created_date DATE NOT NULL,
-    PRIMARY KEY (`message_id`),
+    created_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (`id`),
     CONSTRAINT message_fk_creator FOREIGN KEY (creator_id)
-        REFERENCES profile (user_id),
+        REFERENCES profile (`id`),
     CONSTRAINT message_fk_parent FOREIGN KEY (parent_id)
-        REFERENCES message (message_id)
-)  ENGINE=INNODB AUTO_INCREMENT=1000 DEFAULT CHARSET=LATIN1;
+        REFERENCES message (`id`)
+)  ENGINE=INNODB DEFAULT CHARSET=LATIN1;
 /*
 13
 drop table message_recipient
 */
 CREATE TABLE message_recipient (
-    id BIGINT NOT NULL AUTO_INCREMENT,
-    recipient_id BIGINT NOT NULL,
-    message_id BIGINT NOT NULL,
-    is_read boolean,
-    PRIMARY KEY (`id`),
+    recipient_id BINARY(16) NOT NULL,
+    message_id BINARY(16) NOT NULL,
+    is_read BOOLEAN,
     CONSTRAINT recipient_fk_recipient FOREIGN KEY (recipient_id)
-        REFERENCES profile (user_id),
+        REFERENCES profile (`id`),
     CONSTRAINT recipient_fk_message FOREIGN KEY (message_id)
-        REFERENCES message (message_id)
-) ENGINE=INNODB AUTO_INCREMENT=1000 DEFAULT CHARSET=LATIN1;
+        REFERENCES message (`id`)
+)  ENGINE=INNODB DEFAULT CHARSET=LATIN1;
 /*
 14
 drop table user_category
 */
 CREATE TABLE user_category (
-    user_id BIGINT NOT NULL,
-    category_id BIGINT NOT NULL,
+    user_id BINARY(16) NOT NULL,
+    category_id BINARY(16) NOT NULL,
     CONSTRAINT user_fk_category FOREIGN KEY (user_id)
-        REFERENCES profile (user_id),
+        REFERENCES profile (`id`),
     CONSTRAINT category_fk_user FOREIGN KEY (category_id)
-        REFERENCES category (category_id)
-) ENGINE=INNODB DEFAULT CHARSET=LATIN1;
+        REFERENCES category (`id`)
+)  ENGINE=INNODB DEFAULT CHARSET=LATIN1;
 /*
 15
 drop table user_story
 */
-CREATE TABLE user_story(
-    user_id BIGINT NOT NULL,
-    story_id BIGINT NOT NULL,
+CREATE TABLE user_story (
+    user_id BINARY(16) NOT NULL,
+    story_id BINARY(16) NOT NULL,
     CONSTRAINT user_fk_story FOREIGN KEY (user_id)
-        REFERENCES profile (user_id),
+        REFERENCES profile (`id`),
     CONSTRAINT story_fk_user FOREIGN KEY (story_id)
-        REFERENCES story (story_id)
-) ENGINE=INNODB DEFAULT CHARSET=LATIN1;
+        REFERENCES story (`id`)
+)  ENGINE=INNODB DEFAULT CHARSET=LATIN1;
 /*
 16
 drop table user_achievement
 */
-CREATE TABLE user_achievement(
-    user_id BIGINT NOT NULL,
-    achievement_id BIGINT NOT NULL,
-    earned_date DATE NOT NULL,
+CREATE TABLE user_achievement (
+    user_id BINARY(16) NOT NULL,
+    achievement_id BINARY(16) NOT NULL,
+    earned_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT user_fk_achievement FOREIGN KEY (user_id)
-        REFERENCES profile (user_id),
+        REFERENCES profile (`id`),
     CONSTRAINT achievement_fk_user FOREIGN KEY (achievement_id)
-        REFERENCES achievement (achievement_id)
-) ENGINE=INNODB DEFAULT CHARSET=LATIN1;
+        REFERENCES achievement (`id`)
+)  ENGINE=INNODB DEFAULT CHARSET=LATIN1;
 /*
 17
 drop table user_author
 */
-CREATE TABLE user_author(
-    user_id BIGINT NOT NULL,
-    author_id BIGINT NOT NULL,
-    earned_date DATE NOT NULL,
+CREATE TABLE user_author (
+    user_id BINARY(16) NOT NULL,
+    author_id BINARY(16) NOT NULL,
+    earned_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT user_fk_author FOREIGN KEY (user_id)
-        REFERENCES profile (user_id),
+        REFERENCES profile (`id`),
     CONSTRAINT author_fk_user FOREIGN KEY (author_id)
-        REFERENCES profile (user_id)
-) ENGINE=INNODB DEFAULT CHARSET=LATIN1;
+        REFERENCES profile (`id`)
+)  ENGINE=INNODB DEFAULT CHARSET=LATIN1;
 /*
 18
 drop table user_friend
 */
-CREATE TABLE user_friend(
-    user_id BIGINT NOT NULL,
-    friend_id BIGINT NOT NULL,
-    earned_date DATE NOT NULL,
+CREATE TABLE user_friend (
+    user_id BINARY(16) NOT NULL,
+    friend_id BINARY(16) NOT NULL,
+    earned_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT user_fk_friend FOREIGN KEY (user_id)
-        REFERENCES profile (user_id),
+        REFERENCES profile (`id`),
     CONSTRAINT friend_fk_user FOREIGN KEY (friend_id)
-        REFERENCES profile (user_id)
-) ENGINE=INNODB DEFAULT CHARSET=LATIN1;
+        REFERENCES profile (`id`)
+)  ENGINE=INNODB DEFAULT CHARSET=LATIN1;
 /*
 19
 drop table recommendations
 */
-CREATE TABLE recommendations(
-    user_id BIGINT NOT NULL,
-    story_id BIGINT NOT NULL,
+CREATE TABLE recommendations (
+    user_id BINARY(16) NOT NULL,
+    story_id BINARY(16) NOT NULL,
     CONSTRAINT recommendation_fk_user FOREIGN KEY (user_id)
-        REFERENCES profile (user_id),
+        REFERENCES profile (`id`),
     CONSTRAINT recommendation_fk_story FOREIGN KEY (story_id)
-        REFERENCES story (story_id)
-) ENGINE=INNODB DEFAULT CHARSET=LATIN1;
+        REFERENCES story (`id`)
+)  ENGINE=INNODB DEFAULT CHARSET=LATIN1;
 /*
 20
 drop table is_story_read
 */
-CREATE TABLE is_story_read(
-    user_id BIGINT NOT NULL,
-    episode_id BIGINT NOT NULL,
-    read_date DATE NOT NULL,
+CREATE TABLE is_story_read (
+    user_id BINARY(16) NOT NULL,
+    episode_id BINARY(16) NOT NULL,
+    read_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT isread_fk_user FOREIGN KEY (user_id)
-        REFERENCES profile (user_id),
+        REFERENCES profile (`id`),
     CONSTRAINT isread_fk_episode FOREIGN KEY (episode_id)
-        REFERENCES episode (episode_id)
-) ENGINE=INNODB DEFAULT CHARSET=LATIN1;
+        REFERENCES episode (`id`)
+)  ENGINE=INNODB DEFAULT CHARSET=LATIN1;
 /*
 21
 drop table story_category
 */
 CREATE TABLE story_category (
-    story_id BIGINT NOT NULL,
-    category_id BIGINT NOT NULL,
+    story_id BINARY(16) NOT NULL,
+    category_id BINARY(16) NOT NULL,
     CONSTRAINT category_fk_story FOREIGN KEY (story_id)
-        REFERENCES story (story_id),
+        REFERENCES story (`id`),
     CONSTRAINT story_fk_category FOREIGN KEY (category_id)
-        REFERENCES category (category_id)
-) ENGINE=INNODB DEFAULT CHARSET=LATIN1;
+        REFERENCES category (`id`)
+)  ENGINE=INNODB DEFAULT CHARSET=LATIN1;
 /*
 22
 drop table save_episode
 */
-CREATE TABLE save_episode(
-    user_id BIGINT NOT NULL,
-    episode_id BIGINT NOT NULL,
+CREATE TABLE save_episode (
+    user_id BINARY(16) NOT NULL,
+    episode_id BINARY(16) NOT NULL,
     CONSTRAINT save_fk_user FOREIGN KEY (user_id)
-        REFERENCES profile (user_id),
+        REFERENCES profile (`id`),
     CONSTRAINT save_fk_episode FOREIGN KEY (episode_id)
-        REFERENCES episode (episode_id)
-) ENGINE=INNODB DEFAULT CHARSET=LATIN1;
+        REFERENCES episode (`id`)
+)  ENGINE=INNODB DEFAULT CHARSET=LATIN1;
+
